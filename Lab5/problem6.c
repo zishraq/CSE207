@@ -1,0 +1,100 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct Node {
+    int data;
+    struct Node *next;
+} Node;
+
+void enqueue(Node **front_node, Node **rear_node, int value) {
+    Node *new_node = (Node *) malloc(sizeof(Node *));
+
+    if (new_node == NULL) {
+        printf("Queue is full!\n");
+    } else {
+        new_node->data = value;
+        new_node->next = NULL;
+
+        if ((*front_node) == NULL) {
+            (*front_node) = (*rear_node) = new_node;
+        } else {
+
+            (*rear_node)->next = new_node;
+            (*rear_node) = new_node;
+        }
+    }
+}
+
+int dequeue(Node **front_node) {
+    int x = -1;
+
+    Node *delete_node;
+
+    if ((*front_node) == NULL) {
+        printf("Queue is empty.\n");
+    } else {
+        delete_node = (*front_node);
+        (*front_node) = (*front_node)->next;
+        x = delete_node->data;
+        free(delete_node);
+    }
+
+    return x;
+}
+
+int isQueueEmpty(Node *front_node) {
+    if (front_node == NULL) {
+        return 1;
+    }
+    return 0;
+}
+
+void displayQueue(Node *front_node) {
+    Node *temp = front_node;
+
+    while(temp != NULL) {
+        printf("%d ", temp->data);
+        temp = temp->next;
+    }
+    printf("\n");
+}
+
+void delete_negatives(Node **front_node, Node **rear_node) {
+    int size = 1;
+    int *arr = (int *) malloc(size * sizeof(int));
+
+    for (int i = 0; !isQueueEmpty((*front_node)); i++) {
+        size = i + 1;
+
+        arr = (int *) realloc(arr, size * sizeof(int));
+
+        *(arr + i) = dequeue(&(*front_node));
+    }
+
+    for (int i = 0; i < size; i++) {
+        if (arr[i] > 0) {
+            enqueue(&(*front_node), &(*rear_node), arr[i]);
+        }
+    }
+
+    free(arr);
+}
+
+int main() {
+    int n, element;
+    Node *front = NULL, *rear = NULL;
+
+    printf("Enter number of elements: ");
+    scanf("%d", &n);
+
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &element);
+        enqueue(&front, &rear, element);
+    }
+
+    delete_negatives(&front, &rear);
+
+    displayQueue(front);
+
+    return 0;
+}
